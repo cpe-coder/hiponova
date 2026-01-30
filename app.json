@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "hiponova",
-    "slug": "hiponova",
+    "slug": "hiponova-xibcpozyo-r3x1fhqm7a5",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -38,11 +38,19 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8cb5cbfe-3a35-48c0-8db5-6a2253fc3bd8"
+      }
+    },
+    "owner": "cpecoder"
   }
 }
