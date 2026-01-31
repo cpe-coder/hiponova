@@ -81,39 +81,39 @@ export default function SignUp() {
 					}}
 				>
 					<View className="items-center -mt-20 justify-center">
-						<Text className="text-5xl text-primary font-bold text-center">
-							RIPE SENSEI
+						<Text className="text-3xl text-center text-primary mt-10 font-bold">
+							Hello, Friend!
 						</Text>
 
-						<Text className="text-2xl text-center text-text mt-10 font-bold">
-							SIGN UP
+						<Text className="text-base text-center text-accent mt-2 font-bold">
+							Create an account to get started
 						</Text>
 					</View>
 					<InputField
-						placeholder=""
-						title="Name"
+						placeholder="Enter your name"
+						title="Name:"
 						value={form.name}
 						handleChangeText={(e) => setForm({ ...form, name: e })}
 						otherStyles="mt-10"
 					/>
 
 					<InputField
-						placeholder=""
-						title="Email"
+						placeholder="Enter your email"
+						title="Email:"
 						value={form.email}
 						handleChangeText={(e: any) => setForm({ ...form, email: e })}
-						otherStyles="mt-7"
+						otherStyles="mt-4"
 					/>
 					<InputField
-						placeholder=""
-						title="Password"
+						placeholder="Enter your password"
+						title="Password:"
 						value={form.password}
 						handleChangeText={(e) => setForm({ ...form, password: e })}
-						otherStyles="mt-7"
+						otherStyles="mt-4"
 					/>
 
 					<Text
-						className={`text-lg text-secondary font-semibold text-center py-1 px-4 ${
+						className={`text-lg text-red-500 font-semibold text-center py-1 px-4 ${
 							errorMessage ? "block" : "hidden"
 						}`}
 					>
@@ -132,16 +132,16 @@ export default function SignUp() {
 						textStyles=""
 						title="Sign Up"
 						disable={disable || isSubmit}
-						containerStyles="mt-7 "
+						containerStyles="mt-10 "
 						submitting={isSubmit || isSubmit}
 					/>
 
 					<View className="flex justify-center pt-5 flex-row gap-2">
-						<Text className="text-lg text-secondText font-pregular">
+						<Text className="text-md text-accent font-regular">
 							Have an account?
 						</Text>
 						<TouchableOpacity onPress={handleRoute}>
-							<Text className="text-lg font-psemibold text-primary">
+							<Text className="text-md font-semibold text-primary">
 								Sign In
 							</Text>
 						</TouchableOpacity>

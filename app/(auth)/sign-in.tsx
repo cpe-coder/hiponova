@@ -71,32 +71,32 @@ export default function SignIn() {
 					}}
 				>
 					<View className="items-center -mt-20 justify-center">
-						<Text className="text-5xl text-primary font-bold text-center">
-							RIPE SENSEI
+						<Text className="text-3xl text-center text-primary mt-10 font-bold">
+							Welcome Back!
 						</Text>
 
-						<Text className="text-2xl text-center text-text mt-10 font-bold">
-							SIGN IN
+						<Text className="text-base text-center text-accent mt-2 font-bold">
+							Sign In to your account to continue
 						</Text>
 					</View>
 
 					<InputField
-						title="Email"
-						placeholder=""
+						title="Email:"
+						placeholder="Enter your email"
 						value={form.email}
 						handleChangeText={(e: any) => setForm({ ...form, email: e })}
-						otherStyles="mt-7"
+						otherStyles="mt-10"
 					/>
 
 					<InputField
-						placeholder=""
-						title="Password"
+						placeholder="Enter your password"
+						title="Password:"
 						value={form.password}
 						handleChangeText={(e: any) => setForm({ ...form, password: e })}
-						otherStyles="mt-7"
+						otherStyles="mt-4"
 					/>
 					<Text
-						className={`text-lg text-secondary font-semibold text-center py-1 px-4 ${
+						className={`text-md text-red-500 font-semibold text-center py-1 px-4 ${
 							errorMessage ? "block" : "hidden"
 						}`}
 					>
@@ -104,7 +104,7 @@ export default function SignIn() {
 					</Text>
 
 					<Text
-						className={`text-lg text-green-500 font-semibold text-center py-1 ${
+						className={`text-md text-green-500 font-semibold text-center py-1 ${
 							successMessage ? "block" : "hidden"
 						}`}
 					>
@@ -116,16 +116,16 @@ export default function SignIn() {
 						textStyles=""
 						handlePress={handleLogin}
 						submitting={isSubmit || isSubmit}
-						containerStyles="mt-7"
+						containerStyles="mt-10"
 						disable={disable || isSubmit}
 					/>
 
 					<View className="flex justify-center pt-5 flex-row gap-2">
-						<Text className="text-lg text-secondText font-pregular">
-							Dont have an account?
+						<Text className="text-md text-accent font-regular">
+							Don&apos;t have an account?
 						</Text>
 						<TouchableOpacity onPress={handleRoute}>
-							<Text className="text-lg font-psemibold text-primary">
+							<Text className="text-md font-semibold text-primary">
 								Sign-Up
 							</Text>
 						</TouchableOpacity>

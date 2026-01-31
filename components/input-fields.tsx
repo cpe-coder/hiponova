@@ -25,18 +25,18 @@ const InputField: React.FC<FormFieldProps> = ({
 
 	return (
 		<View className={`space-y-2 ${otherStyles}`}>
-			<Text className="text-base text-gray-100  mb-2 font-pmedium">
+			<Text className="text-base text-secondary  mb-2 font-medium">
 				{title}
 			</Text>
 
 			<View
-				className={`w-full h-16 px-4 bg-black-100 rounded-2xl border  border-gray-100  focus:border-primary flex flex-row items-center ${borderStyle} `}
+				className={`w-full h-14 px-4 bg-black-100 rounded-xl border  border-primary  focus:border-primary flex flex-row items-center ${borderStyle} `}
 			>
 				<TextInput
-					className="flex-1 text-text font-psemibold text-base"
+					className="flex-1 text-accent font-semibold text-base"
 					value={value}
 					placeholder={placeholder}
-					placeholderTextColor="#7B7B8B"
+					placeholderTextColor="#556270"
 					onChangeText={handleChangeText}
 					secureTextEntry={title === "Password" && !showPassword}
 					{...props}
@@ -45,9 +45,10 @@ const InputField: React.FC<FormFieldProps> = ({
 				{title === "Password" && (
 					<TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
 						<Image
-							source={!showPassword ? icon.eye : icon.eyeClose}
+							source={!showPassword ? icon.Eye : icon.EyeClose}
 							className="w-6 h-6"
 							resizeMode="contain"
+							tintColor="#ff8903"
 						/>
 					</TouchableOpacity>
 				)}
