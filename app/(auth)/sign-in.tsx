@@ -47,7 +47,7 @@ export default function SignIn() {
 					setSuccessMessage(res.data.message);
 					setIsSubmit(false);
 					setTimeout(() => {
-						router.push("/Home");
+						router.push("./Home");
 					}, 1500);
 				}
 			} catch (error: any) {
@@ -58,7 +58,7 @@ export default function SignIn() {
 	};
 
 	const handleRoute = () => {
-		router.push("/(auth)/sign-up");
+		router.push("./(auth)/sign-up");
 	};
 
 	return (

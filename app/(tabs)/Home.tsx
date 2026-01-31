@@ -4,8 +4,7 @@ import { useAuth } from "@/context/auth-context";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { format } from "date-fns";
-import * as ScreenOrientation from "expo-screen-orientation";
-import React, { useEffect } from "react";
+import React from "react";
 
 import {
 	ActivityIndicator,
@@ -34,7 +33,7 @@ export default function Home() {
 
 			const res = await axios.post(
 				"https://ripe-sensei-server-9z7p.vercel.app/api/getRecords",
-				{ email: userData?.email }
+				{ email: userData?.email },
 			);
 
 			if (res.status === 200) {
@@ -48,26 +47,12 @@ export default function Home() {
 			setIsChecking(false);
 		}
 	};
-
-	useEffect(() => {
-		const unsubscribe = navigation.addListener("focus", () => {
-			try {
-				ScreenOrientation.lockAsync(
-					ScreenOrientation.OrientationLock.PORTRAIT_UP
-				);
-			} catch (error) {
-				console.log(error);
-			}
-		});
-
-		return unsubscribe;
-	}, [navigation]);
 	return (
 		<>
 			<SafeAreaView className="flex-1 bg-background">
 				<View className="px-4 py-4">
 					<Text className="text-5xl text-primary italic font-bold text-center">
-						RIPE SENSEI
+						HipoNova
 					</Text>
 				</View>
 
