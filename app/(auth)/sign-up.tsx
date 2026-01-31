@@ -54,7 +54,7 @@ export default function SignUp() {
 						setSuccessMessage(res.data.message);
 						setIsSubmit(false);
 						setTimeout(() => {
-							router.push("./sign-in");
+							router.push("/sign-in");
 						}, 1500);
 					}
 				})
@@ -69,7 +69,7 @@ export default function SignUp() {
 	};
 
 	const handleRoute = () => {
-		router.push("./sign-in");
+		router.push("/sign-in");
 	};
 	return (
 		<SafeAreaView className="bg-background h-full">

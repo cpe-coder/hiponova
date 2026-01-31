@@ -20,7 +20,7 @@ export default function TabLayout() {
 	}, [authState]);
 
 	if (isAuthenticated) {
-		return <Redirect href={"./sign-in"} />;
+		return <Redirect href={"/sign-in"} />;
 	}
 
 	return (

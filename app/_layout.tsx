@@ -26,7 +26,7 @@ export default function RootLayout() {
 							<ProfileInfo />
 							<DrawerItem
 								label="Home"
-								onPress={() => route.navigate("./Home")}
+								onPress={() => route.navigate("/Home")}
 								icon={({ color }) => {
 									return <DrawerIcon color={color} icon={icon.Home} />;
 								}}
@@ -42,7 +42,7 @@ export default function RootLayout() {
 							/>
 							<DrawerItem
 								label="Logs"
-								onPress={() => route.navigate("./Logs")}
+								onPress={() => route.navigate("/Logs")}
 								icon={({ color }) => {
 									return <DrawerIcon color={color} icon={icon.Logs} />;
 								}}
@@ -58,7 +58,7 @@ export default function RootLayout() {
 							/>
 							<DrawerItem
 								label="Teams"
-								onPress={() => route.navigate("./Teams")}
+								onPress={() => route.navigate("/Teams")}
 								icon={({ color }) => {
 									return <DrawerIcon color={color} icon={icon.Team} />;
 								}}
