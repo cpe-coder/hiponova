@@ -2,90 +2,83 @@ import { Header } from "@/components";
 import { useAuth } from "@/context/auth-context";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Redirect, Tabs, usePathname } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import React from "react";
 
 export default function TabLayout() {
 	const { authState } = useAuth();
-	const [isAuthenticated, setIsAthenticated] = React.useState(false);
-	const pathName = usePathname();
+	const [isAuthenticated, setIsAuthenticated] = React.useState(false);
 
 	React.useEffect(() => {
-		if (!authState?.authenticated) {
-			setIsAthenticated(true);
-			return;
-		}
-		setIsAthenticated(false);
-		return;
+		setIsAuthenticated(!authState?.authenticated);
 	}, [authState]);
 
 	if (isAuthenticated) {
-		return <Redirect href={"/sign-in"} />;
+		return <Redirect href="/sign-in" />;
 	}
 
 	return (
-		<>
-			<Tabs
-				screenOptions={{
-					headerShadowVisible: false,
-					tabBarActiveTintColor: "#00ffb2",
-					tabBarInactiveTintColor: "white",
-					tabBarStyle: {
-						backgroundColor: "#0a0f1c",
-						borderTopWidth: 0,
-					},
+		<Tabs
+			screenOptions={{
+				headerShadowVisible: false,
+				tabBarStyle: {
+					backgroundColor: "#fff",
+					borderTopWidth: 0,
+				},
+				tabBarInactiveTintColor: "white",
+			}}
+		>
+			<Tabs.Screen
+				name="Home"
+				options={{
+					title: "Home",
+
+					headerRight: () => <Header.HeaderRight />,
+					headerStyle: { backgroundColor: "#fff" },
+					headerTintColor: "#ff8903",
+					tabBarIcon: ({ focused }) => (
+						<FontAwesome6
+							name="house"
+							size={24}
+							color={focused ? "#ff8903" : "#374151"}
+						/>
+					),
 				}}
-			>
-				<Tabs.Screen
-					name="Home"
-					options={{
-						href: pathName === "/Control" ? null : undefined,
-						title: "Home",
-						headerRight: () => {
-							return pathName === "/Control" ? "" : <Header.HeaderRight />;
-						},
-						headerStyle: {
-							backgroundColor: "#0a0f1c",
-						},
-						headerTintColor: "white",
+			/>
 
-						tabBarIcon: ({ color, focused }) =>
-							pathName !== "/Control" && (
-								<FontAwesome6
-									size={24}
-									name="house"
-									color={color}
-									focusable={focused}
-								/>
-							),
-					}}
-				/>
-				<Tabs.Screen
-					name="Control"
-					options={{
-						href: pathName === "/Control" ? null : undefined,
-						title: pathName === "/Control" ? " " : "Control",
+			<Tabs.Screen
+				name="Logs"
+				options={{
+					title: "Logs",
+					headerRight: () => <Header.HeaderRight />,
+					headerStyle: { backgroundColor: "#fff" },
+					headerTintColor: "#ff8903",
+					tabBarIcon: ({ focused }) => (
+						<MaterialIcons
+							name="article"
+							size={28}
+							color={focused ? "#ff8903" : "#374151"}
+						/>
+					),
+				}}
+			/>
 
-						headerRight: () => {
-							return pathName === "/Control" ? "" : <Header.HeaderRight />;
-						},
-						headerStyle: {
-							backgroundColor: "#0a0f1c",
-						},
-						headerTintColor: "white",
-
-						tabBarIcon: ({ color, focused }) =>
-							pathName !== "/Control" && (
-								<MaterialIcons
-									name="gamepad"
-									size={28}
-									color={color}
-									focusable={focused}
-								/>
-							),
-					}}
-				/>
-			</Tabs>
-		</>
+			<Tabs.Screen
+				name="Teams"
+				options={{
+					title: "Teams",
+					headerRight: () => <Header.HeaderRight />,
+					headerStyle: { backgroundColor: "#fff" },
+					headerTintColor: "#ff8903",
+					tabBarIcon: ({ focused }) => (
+						<MaterialIcons
+							name="groups"
+							size={28}
+							color={focused ? "#ff8903" : "#374151"}
+						/>
+					),
+				}}
+			/>
+		</Tabs>
 	);
 }

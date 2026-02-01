@@ -17,7 +17,7 @@ export default function RootLayout() {
 			<Drawer
 				screenOptions={{
 					drawerStyle: {
-						backgroundColor: "#0a0f1c",
+						backgroundColor: "#fff",
 					},
 				}}
 				drawerContent={(props) => (
