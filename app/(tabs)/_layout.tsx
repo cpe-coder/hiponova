@@ -25,7 +25,8 @@ export default function TabLayout() {
 					backgroundColor: "#fff",
 					borderTopWidth: 0,
 				},
-				tabBarInactiveTintColor: "white",
+				tabBarInactiveTintColor: "#374151",
+				tabBarActiveTintColor: "#ff8903",
 			}}
 		>
 			<Tabs.Screen
@@ -41,6 +42,7 @@ export default function TabLayout() {
 							name="house"
 							size={24}
 							color={focused ? "#ff8903" : "#374151"}
+							focusable={focused}
 						/>
 					),
 				}}
@@ -58,6 +60,7 @@ export default function TabLayout() {
 							name="article"
 							size={28}
 							color={focused ? "#ff8903" : "#374151"}
+							focusable={focused}
 						/>
 					),
 				}}
@@ -75,6 +78,7 @@ export default function TabLayout() {
 							name="groups"
 							size={28}
 							color={focused ? "#ff8903" : "#374151"}
+							focusable={focused}
 						/>
 					),
 				}}
