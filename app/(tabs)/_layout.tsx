@@ -1,4 +1,4 @@
-import { Header } from "@/components";
+import { Settings } from "@/components";
 import { useAuth } from "@/context/auth-context";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -34,7 +34,9 @@ export default function TabLayout() {
 				options={{
 					title: "Home",
 
-					headerRight: () => <Header.HeaderRight />,
+					headerRight: () => {
+						return <Settings />;
+					},
 					headerStyle: { backgroundColor: "#fff" },
 					headerTintColor: "#ff8903",
 					tabBarIcon: ({ focused }) => (
@@ -52,7 +54,9 @@ export default function TabLayout() {
 				name="Logs"
 				options={{
 					title: "Logs",
-					headerRight: () => <Header.HeaderRight />,
+					headerRight: () => {
+						return <Settings />;
+					},
 					headerStyle: { backgroundColor: "#fff" },
 					headerTintColor: "#ff8903",
 					tabBarIcon: ({ focused }) => (
@@ -70,7 +74,9 @@ export default function TabLayout() {
 				name="Teams"
 				options={{
 					title: "Teams",
-					headerRight: () => <Header.HeaderRight />,
+					headerRight: () => {
+						return <Settings />;
+					},
 					headerStyle: { backgroundColor: "#fff" },
 					headerTintColor: "#ff8903",
 					tabBarIcon: ({ focused }) => (

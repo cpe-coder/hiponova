@@ -1,9 +1,11 @@
 import { CustomButton, InputField } from "@/components";
+import { images } from "@/constant/images";
 import { useAuth } from "@/context/auth-context";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
 	Dimensions,
+	Image,
 	SafeAreaView,
 	ScrollView,
 	Text,
@@ -75,13 +77,14 @@ export default function SignUp() {
 		<SafeAreaView className="bg-background h-full">
 			<ScrollView>
 				<View
-					className="w-full flex justify-center h-full px-4 my-6"
+					className="w-full flex justify-center h-full px-4"
 					style={{
 						minHeight: Dimensions.get("window").height - 100,
 					}}
 				>
-					<View className="items-center -mt-20 justify-center">
-						<Text className="text-3xl text-center text-primary mt-10 font-bold">
+					<View className="items-center justify-center">
+						<Image source={images.Logo} className="h-40 w-40" />
+						<Text className="text-3xl text-center text-primary font-bold">
 							Hello, Friend!
 						</Text>
 

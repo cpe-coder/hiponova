@@ -17,11 +17,10 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import DrawerIcon from "./drawer-icon";
 
 const Settings = () => {
 	const [visible, setVisible] = React.useState(false);
-	const { userImage, userData } = useAuth();
+	const { userImage, userData, onLogout } = useAuth();
 	const [mediaPermission, requestMediaPermission] =
 		useMediaLibraryPermissions();
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -52,15 +51,16 @@ const Settings = () => {
 	};
 	return (
 		<View className="flex">
-			<TouchableOpacity
-				style={{
-					borderRadius: 12,
-				}}
-				className="flex-row items-center font-bold"
+			<Pressable
 				onPress={() => setVisible((prev) => !prev)}
+				className="text-white rounded-full bg-gray-800 mx-4"
 			>
-				<DrawerIcon color="white" icon={icon.settings} />
-			</TouchableOpacity>
+				<Image
+					source={!userImage ? icon.User : { uri: userImage.image }}
+					alt="avaltar"
+					className="w-11 h-11 rounded-full"
+				/>
+			</Pressable>
 
 			<Modal
 				transparent
@@ -68,16 +68,16 @@ const Settings = () => {
 				onRequestClose={() => setVisible(false)}
 				animationType="fade"
 			>
-				<View className=" bg-background w-screen h-screen">
+				<View className=" bg-white w-screen h-screen pt-8">
 					<View className="flex p-4 flex-row gap-2 items-center justify-start">
 						<Pressable onPress={() => setVisible(false)} className=" mr-5">
-							<Ionicons name="arrow-back" size={24} color="white" />
+							<Ionicons name="arrow-back" size={24} color="#ff8903" />
 						</Pressable>
 						<Text className="text-text font-bold text-xl">Settings</Text>
 					</View>
 					<View className="flex w-full justify-center items-center pt-5">
 						<Image
-							source={!userImage ? icon.user : { uri: userImage.image }}
+							source={!userImage ? icon.User : { uri: userImage.image }}
 							className="w-28 h-28 border border-primary rounded-full"
 						/>
 
@@ -87,7 +87,7 @@ const Settings = () => {
 					</View>
 					<View className="py-2">
 						<Pressable className="flex-row px-4 py-2 justify-start items-center gap-5 active:bg-gray-300/20 transition-all duration-300 active:transition-all active:duration-300">
-							<View className="bg-secondText rounded-full p-3">
+							<View className="bg-red-500 rounded-full p-3">
 								<MaterialIcons name="alternate-email" size={24} color="white" />
 							</View>
 							<View>
@@ -101,11 +101,18 @@ const Settings = () => {
 							onPress={() => chooseFromLibrary()}
 							className="flex-row px-4 py-2 justify-start items-center gap-5 active:bg-gray-300/20 transition-all duration-300 active:transition-all active:duration-300"
 						>
-							<View className="bg-secondText rounded-full p-3">
+							<View className="bg-secondary rounded-full p-3">
 								<Entypo name="camera" size={24} color="white" />
 							</View>
 							<Text className=" text-lg text-text">Change Profile Image</Text>
 						</Pressable>
+					</View>
+					<View className="flex-1 justify-end bottom-20 items-center">
+						<TouchableOpacity onPress={onLogout} className="">
+							<Text className="text-center text-primary font-medium">
+								Logout
+							</Text>
+						</TouchableOpacity>
 					</View>
 				</View>
 			</Modal>

@@ -1,92 +1,31 @@
-import { DrawerIcon, Logout, ProfileInfo } from "@/components";
-import { icon } from "@/constant/icon";
 import { AuthProvider } from "@/context/auth-context";
-import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
-import { usePathname, useRouter } from "expo-router";
-import Drawer from "expo-router/drawer";
+import { Stack } from "expo-router";
 import React from "react";
-import { View } from "react-native";
 import "../global.css";
 
 export default function RootLayout() {
-	const route = useRouter();
-	const pathName = usePathname();
-
 	return (
 		<AuthProvider>
-			<Drawer
-				screenOptions={{
-					drawerStyle: {
-						backgroundColor: "#fff",
-					},
-				}}
-				drawerContent={(props) => (
-					<View className="flex-1">
-						<DrawerContentScrollView {...props}>
-							<ProfileInfo />
-							<DrawerItem
-								label="Home"
-								onPress={() => route.navigate("/Home")}
-								icon={({ color }) => {
-									return <DrawerIcon color={color} icon={icon.Home} />;
-								}}
-								focused={pathName === "/Home" && true}
-								inactiveTintColor="white"
-								activeBackgroundColor="#002b2e"
-								activeTintColor="#00ffb2"
-								style={{
-									borderRadius: 12,
-									margin: 0,
-									padding: 0,
-								}}
-							/>
-							<DrawerItem
-								label="Logs"
-								onPress={() => route.navigate("/Logs")}
-								icon={({ color }) => {
-									return <DrawerIcon color={color} icon={icon.Logs} />;
-								}}
-								focused={pathName === "/Logs" && true}
-								inactiveTintColor="white"
-								activeBackgroundColor="#002b2e"
-								activeTintColor="#00ffb2"
-								style={{
-									borderRadius: 12,
-									margin: 0,
-									padding: 0,
-								}}
-							/>
-							<DrawerItem
-								label="Teams"
-								onPress={() => route.navigate("/Teams")}
-								icon={({ color }) => {
-									return <DrawerIcon color={color} icon={icon.Team} />;
-								}}
-								focused={pathName === "/Teams" && true}
-								inactiveTintColor="white"
-								activeBackgroundColor="#002b2e"
-								activeTintColor="#00ffb2"
-								style={{
-									borderRadius: 12,
-									margin: 0,
-									padding: 0,
-								}}
-							/>
-						</DrawerContentScrollView>
-
-						<Logout />
-					</View>
-				)}
-			>
-				<Drawer.Screen options={{ headerShown: false }} name="index" />
-				<Drawer.Screen options={{ headerShown: false }} name="(auth)" />
-				<Drawer.Screen
+			<Stack>
+				<Stack.Screen
+					name="(tabs)"
 					options={{
 						headerShown: false,
 					}}
-					name="(tabs)"
 				/>
-			</Drawer>
+				<Stack.Screen
+					name="(auth)"
+					options={{
+						headerShown: false,
+					}}
+				/>
+				<Stack.Screen
+					name="index"
+					options={{
+						headerShown: false,
+					}}
+				/>
+			</Stack>
 		</AuthProvider>
 	);
 }
