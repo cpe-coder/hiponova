@@ -11,7 +11,6 @@ import database from "@/utils/firebase.config";
 import { onValue, ref, set } from "firebase/database";
 
 export default function Home() {
-	// STATES
 	const [temperature, setTemperature] = useState<number | null>(null);
 	const [timerMinutes, setTimerMinutes] = useState("");
 	const [remainingSeconds, setRemainingSeconds] = useState(0);
@@ -19,6 +18,7 @@ export default function Home() {
 	const [isGrinding, setIsGrinding] = useState(false);
 
 	const intervalRef = useRef<number | null>(null);
+	const isStartingRef = useRef(false); // 👈
 
 	const startDehydrating = async () => {
 		await set(ref(database, "device/dehydrating"), true);
@@ -28,13 +28,23 @@ export default function Home() {
 		await set(ref(database, "device/dehydrating"), false);
 	};
 
+	const setCancel = async (value: boolean) => {
+		await set(ref(database, "controls/cancel"), value);
+	};
+
 	const setGrinding = async (value: boolean) => {
 		await set(ref(database, "device/grinding"), value);
 	};
 
 	const getTemperature = () =>
 		onValue(ref(database, "sensor/temperature"), (snapshot) => {
-			setTemperature(snapshot.val());
+			const value = snapshot.val();
+
+			if (typeof value === "number") {
+				setTemperature(Number(value.toFixed(2)));
+			} else {
+				setTemperature(null);
+			}
 		});
 
 	const getDehydratingStatus = () =>
@@ -47,9 +57,25 @@ export default function Home() {
 			setIsGrinding(snapshot.val());
 		});
 
+	const getCancelStatus = () =>
+		onValue(ref(database, "controls/cancel"), async (snapshot) => {
+			const value = snapshot.val();
+
+			if (value === true && !isStartingRef.current) {
+				await cancelTimer();
+			}
+		});
+
+	/* -------------------- TIMER LOGIC -------------------- */
+
 	const startTimer = async () => {
 		const minutes = Number(timerMinutes);
 		if (!minutes || minutes <= 0) return;
+
+		isStartingRef.current = true;
+
+		// RESET CANCEL FIRST
+		await setCancel(false);
 
 		const totalSeconds = minutes * 60;
 		setRemainingSeconds(totalSeconds);
@@ -65,6 +91,11 @@ export default function Home() {
 				return prev - 1;
 			});
 		}, 1000);
+
+		// allow cancel again after start completes
+		setTimeout(() => {
+			isStartingRef.current = false;
+		}, 500);
 	};
 
 	const cancelTimer = async () => {
@@ -72,9 +103,13 @@ export default function Home() {
 			clearInterval(intervalRef.current);
 			intervalRef.current = null;
 		}
+
 		setRemainingSeconds(0);
 		await stopDehydrating();
+		await setCancel(true);
 	};
+
+	/* -------------------- FORMAT -------------------- */
 
 	const formatTime = (seconds: number) => {
 		const m = Math.floor(seconds / 60);
@@ -82,18 +117,24 @@ export default function Home() {
 		return `${m}:${s.toString().padStart(2, "0")}`;
 	};
 
+	/* -------------------- LIFECYCLE -------------------- */
+
 	useEffect(() => {
 		const unsubTemp = getTemperature();
 		const unsubDehydrating = getDehydratingStatus();
 		const unsubGrinding = getGrindingStatus();
+		const unsubCancel = getCancelStatus();
 
 		return () => {
 			unsubTemp();
 			unsubDehydrating();
 			unsubGrinding();
+			unsubCancel();
 			if (intervalRef.current) clearInterval(intervalRef.current);
 		};
-	}, []);
+	}, [getCancelStatus]);
+
+	/* -------------------- UI -------------------- */
 
 	return (
 		<SafeAreaView className="flex-1 bg-gray-50 px-4">
@@ -119,7 +160,6 @@ export default function Home() {
 					value={timerMinutes}
 					onChangeText={setTimerMinutes}
 					keyboardType="numeric"
-					placeholder="Enter minutes"
 					editable={!isDehydrating}
 					className="border rounded px-3 py-2 bg-white mb-3"
 				/>
@@ -147,12 +187,6 @@ export default function Home() {
 					>
 						<Text className="text-white text-center font-bold">Cancel</Text>
 					</TouchableOpacity>
-				)}
-
-				{isDehydrating && (
-					<Text className="text-center text-red-600 font-bold mt-3">
-						Dehydrating...
-					</Text>
 				)}
 			</View>
 
