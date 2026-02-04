@@ -7,14 +7,14 @@ import { getDatabase } from "firebase/database";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-	apiKey: "AIzaSyC7NCL_wPeW7p-7TfDA25vaK56N1W8uLjg",
-	authDomain: "hiponova-77ae7.firebaseapp.com",
-	databaseURL: "https://hiponova-77ae7-default-rtdb.firebaseio.com",
-	projectId: "hiponova-77ae7",
-	storageBucket: "hiponova-77ae7.firebasestorage.app",
-	messagingSenderId: "424440679687",
-	appId: "1:424440679687:web:c279aaa6d4011f029289a2",
-	measurementId: "G-077L6ZEHB2",
+	apiKey: "AIzaSyAWuCdsgwtT3YtnyUcioHb6WD_piNqT2Wk",
+	authDomain: "hiponova-c657a.firebaseapp.com",
+	databaseURL: "https://hiponova-c657a-default-rtdb.firebaseio.com",
+	projectId: "hiponova-c657a",
+	storageBucket: "hiponova-c657a.firebasestorage.app",
+	messagingSenderId: "174816674498",
+	appId: "1:174816674498:web:1fb6d59544647ebbd2715b",
+	measurementId: "G-FP0LXHBRM1",
 };
 
 // Initialize Firebase
