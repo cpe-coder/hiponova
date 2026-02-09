@@ -16,9 +16,14 @@ export default function Home() {
 	const [remainingSeconds, setRemainingSeconds] = useState(0);
 	const [isDehydrating, setIsDehydrating] = useState(false);
 	const [isGrinding, setIsGrinding] = useState(false);
+	const [starting, setStarting] = useState(false);
 
 	const intervalRef = useRef<number | null>(null);
 	const isStartingRef = useRef(false); // 👈
+
+	useEffect(() => {
+		getStartingValue();
+	});
 
 	const startDehydrating = async () => {
 		await set(ref(database, "device/dehydrating"), true);
@@ -31,6 +36,11 @@ export default function Home() {
 	const setCancel = async (value: boolean) => {
 		await set(ref(database, "controls/cancel"), value);
 	};
+
+	const getStartingValue = () =>
+		onValue(ref(database, "controls/starting"), (snapshot) => {
+			setStarting(snapshot.val());
+		});
 
 	const setGrinding = async (value: boolean) => {
 		await set(ref(database, "device/grinding"), value);
@@ -67,6 +77,13 @@ export default function Home() {
 		});
 
 	/* -------------------- TIMER LOGIC -------------------- */
+
+	const adjustTimer = (deltaSeconds: number) => {
+		setRemainingSeconds((prev) => {
+			const updated = prev + deltaSeconds;
+			return updated > 0 ? updated : 0;
+		});
+	};
 
 	const startTimer = async () => {
 		const minutes = Number(timerMinutes);
@@ -106,7 +123,11 @@ export default function Home() {
 
 		setRemainingSeconds(0);
 		await stopDehydrating();
-		await setCancel(true);
+		if (starting === true) {
+			await setCancel(false);
+		} else {
+			setCancel(true);
+		}
 	};
 
 	/* -------------------- FORMAT -------------------- */
@@ -165,9 +186,27 @@ export default function Home() {
 				/>
 
 				{isDehydrating && (
-					<Text className="text-center text-3xl font-bold mb-3">
-						{formatTime(remainingSeconds)}
-					</Text>
+					<View className="items-center mb-4">
+						<Text className="text-3xl font-bold mb-3">
+							{formatTime(remainingSeconds)}
+						</Text>
+
+						<View className="flex-row gap-4">
+							<TouchableOpacity
+								onPress={() => adjustTimer(-60)}
+								className="bg-orange-500 px-4 py-2 rounded"
+							>
+								<Text className="text-white font-bold">-1 min</Text>
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								onPress={() => adjustTimer(60)}
+								className="bg-green-600 px-4 py-2 rounded"
+							>
+								<Text className="text-white font-bold">+1 min</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
 				)}
 
 				<TouchableOpacity
