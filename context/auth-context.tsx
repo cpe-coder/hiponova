@@ -107,14 +107,24 @@ export const AuthProvider = ({ children }: any) => {
 	};
 
 	const Logout = async () => {
-		console.log("logout");
-		await SecureStore.deleteItemAsync(TOKEN_KEY);
+		try {
+			await axios.post(`${API_URL}/api/auth/logout`);
+		} catch (error) {
+			console.log("Logout API error:", error);
+		}
 
+		await SecureStore.deleteItemAsync(TOKEN_KEY);
 		axios.defaults.headers.common["Authorization"] = "";
 
 		setAuthState({
 			token: null,
 			authenticated: false,
+		});
+
+		setUserData({
+			id: "",
+			name: "",
+			email: "",
 		});
 	};
 

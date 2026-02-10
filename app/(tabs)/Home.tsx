@@ -16,68 +16,76 @@ export default function Home() {
 	const [remainingSeconds, setRemainingSeconds] = useState(0);
 	const [isDehydrating, setIsDehydrating] = useState(false);
 	const [isGrinding, setIsGrinding] = useState(false);
-	const [starting, setStarting] = useState(false);
+	const [starting, setStartingState] = useState(false);
 
-	const intervalRef = useRef<number | null>(null);
-	const isStartingRef = useRef(false); // 👈
+	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	const isStartingRef = useRef(false);
 
-	useEffect(() => {
-		getStartingValue();
-	});
-
-	const startDehydrating = async () => {
+	/* -------------------- FIREBASE HELPERS -------------------- */
+	const startDehydrating = async () =>
 		await set(ref(database, "device/dehydrating"), true);
-	};
-
-	const stopDehydrating = async () => {
+	const stopDehydrating = async () =>
 		await set(ref(database, "device/dehydrating"), false);
-	};
-
-	const setCancel = async (value: boolean) => {
+	const setStarting = async (value: boolean) =>
+		await set(ref(database, "controls/starting"), value);
+	const setCancel = async (value: boolean) =>
 		await set(ref(database, "controls/cancel"), value);
-	};
-
-	const getStartingValue = () =>
-		onValue(ref(database, "controls/starting"), (snapshot) => {
-			setStarting(snapshot.val());
-		});
-
-	const setGrinding = async (value: boolean) => {
+	const setGrinding = async (value: boolean) =>
 		await set(ref(database, "device/grinding"), value);
-	};
 
-	const getTemperature = () =>
-		onValue(ref(database, "sensor/temperature"), (snapshot) => {
-			const value = snapshot.val();
+	/* -------------------- FIREBASE LISTENERS -------------------- */
+	useEffect(() => {
+		const unsubTemp = onValue(
+			ref(database, "sensor/temperature"),
+			(snapshot) => {
+				const value = snapshot.val();
+				if (typeof value === "number") setTemperature(Number(value.toFixed(2)));
+				else setTemperature(null);
+			},
+		);
 
-			if (typeof value === "number") {
-				setTemperature(Number(value.toFixed(2)));
-			} else {
-				setTemperature(null);
-			}
-		});
+		const unsubDehydrating = onValue(
+			ref(database, "device/dehydrating"),
+			(snapshot) => {
+				setIsDehydrating(snapshot.val());
+			},
+		);
 
-	const getDehydratingStatus = () =>
-		onValue(ref(database, "device/dehydrating"), (snapshot) => {
-			setIsDehydrating(snapshot.val());
-		});
+		const unsubGrinding = onValue(
+			ref(database, "device/grinding"),
+			(snapshot) => {
+				setIsGrinding(snapshot.val());
+			},
+		);
 
-	const getGrindingStatus = () =>
-		onValue(ref(database, "device/grinding"), (snapshot) => {
-			setIsGrinding(snapshot.val());
-		});
+		const unsubStarting = onValue(
+			ref(database, "controls/starting"),
+			(snapshot) => {
+				setStartingState(snapshot.val());
+			},
+		);
 
-	const getCancelStatus = () =>
-		onValue(ref(database, "controls/cancel"), async (snapshot) => {
-			const value = snapshot.val();
+		const unsubCancel = onValue(
+			ref(database, "controls/cancel"),
+			async (snapshot) => {
+				const value = snapshot.val();
+				if (value === true && !isStartingRef.current) {
+					await cancelTimer();
+				}
+			},
+		);
 
-			if (value === true && !isStartingRef.current) {
-				await cancelTimer();
-			}
-		});
+		return () => {
+			unsubTemp();
+			unsubDehydrating();
+			unsubGrinding();
+			unsubStarting();
+			unsubCancel();
+			if (intervalRef.current) clearInterval(intervalRef.current);
+		};
+	}, []);
 
 	/* -------------------- TIMER LOGIC -------------------- */
-
 	const adjustTimer = (deltaSeconds: number) => {
 		setRemainingSeconds((prev) => {
 			const updated = prev + deltaSeconds;
@@ -91,8 +99,9 @@ export default function Home() {
 
 		isStartingRef.current = true;
 
-		// RESET CANCEL FIRST
+		// Reset cancel first
 		await setCancel(false);
+		await setStarting(true);
 
 		const totalSeconds = minutes * 60;
 		setRemainingSeconds(totalSeconds);
@@ -109,7 +118,6 @@ export default function Home() {
 			});
 		}, 1000);
 
-		// allow cancel again after start completes
 		setTimeout(() => {
 			isStartingRef.current = false;
 		}, 500);
@@ -123,40 +131,25 @@ export default function Home() {
 
 		setRemainingSeconds(0);
 		await stopDehydrating();
-		if (starting === true) {
+
+		// Update Firebase: cancel momentary trigger
+		await setStarting(false);
+		await setCancel(true);
+
+		// Automatically reset cancel to false after 1 second
+		setTimeout(async () => {
 			await setCancel(false);
-		} else {
-			setCancel(true);
-		}
+		}, 10000);
 	};
 
 	/* -------------------- FORMAT -------------------- */
-
 	const formatTime = (seconds: number) => {
 		const m = Math.floor(seconds / 60);
 		const s = seconds % 60;
 		return `${m}:${s.toString().padStart(2, "0")}`;
 	};
 
-	/* -------------------- LIFECYCLE -------------------- */
-
-	useEffect(() => {
-		const unsubTemp = getTemperature();
-		const unsubDehydrating = getDehydratingStatus();
-		const unsubGrinding = getGrindingStatus();
-		const unsubCancel = getCancelStatus();
-
-		return () => {
-			unsubTemp();
-			unsubDehydrating();
-			unsubGrinding();
-			unsubCancel();
-			if (intervalRef.current) clearInterval(intervalRef.current);
-		};
-	}, [getCancelStatus]);
-
 	/* -------------------- UI -------------------- */
-
 	return (
 		<SafeAreaView className="flex-1 bg-gray-50 px-4">
 			<View className="py-4">

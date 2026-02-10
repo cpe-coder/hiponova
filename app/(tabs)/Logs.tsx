@@ -1,75 +1,92 @@
-import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { API_URL, useAuth } from "@/context/auth-context";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+
+const formatManilaTime = (date: string | null) => {
+	if (!date) return "-";
+
+	return new Date(date).toLocaleString("en-PH", {
+		timeZone: "Asia/Manila",
+		hour: "2-digit",
+		minute: "2-digit",
+		second: "2-digit",
+		hour12: true,
+	});
+};
 
 export default function Logs() {
-	const scheduleLogs = Array.from({ length: 15 }, (_, i) => ({
-		id: i + 1,
-		createdAt: `2026-02-04 ${8 + i}:00`,
-		scheduleDate: `2026-02-0${(i % 6) + 4}`,
-		status: ["Pending", "Processing", "Completed"][i % 3],
-	}));
+	const { authState } = useAuth();
+	const [logs, setLogs] = useState<any[]>([]);
+	const [loading, setLoading] = useState(true);
 
-	const loginLogs = Array.from({ length: 12 }, (_, i) => ({
-		id: i + 1,
-		timestamp: `2026-02-04 ${8 + i}:05`,
-		user: `user${i + 1}@email.com`,
-		action: "Login",
-		active: i % 2 === 0,
-	}));
+	useEffect(() => {
+		if (!authState?.authenticated) return;
 
-	const tableHeight = 300;
+		const fetchLogs = async () => {
+			try {
+				const res = await axios.get(`${API_URL}/api/logs/login`);
+				setLogs(res.data);
+			} catch (error) {
+				console.log("Failed to load logs:", error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchLogs();
+	}, [authState?.authenticated]);
+
+	if (!authState?.authenticated) {
+		return (
+			<View className="flex-1 items-center justify-center bg-gray-50">
+				<Text className="text-gray-500">Please login to view logs</Text>
+			</View>
+		);
+	}
+
+	if (loading) {
+		return (
+			<View className="flex-1 items-center justify-center bg-gray-50">
+				<ActivityIndicator size="large" />
+			</View>
+		);
+	}
 
 	return (
 		<ScrollView className="flex-1 bg-gray-50 px-4 py-4">
-			<Text className="text-2xl font-bold text-primary mb-3">
-				Schedule Logs
-			</Text>
-			<View className="border rounded-lg overflow-hidden mb-8">
-				<View className="flex-row bg-gray-200 p-2">
-					<Text className="flex-1 font-semibold">Created At</Text>
-					<Text className="flex-1 font-semibold">Schedule Date</Text>
-					<Text className="flex-2 font-semibold">Status</Text>
-				</View>
-
-				<ScrollView
-					style={{ maxHeight: tableHeight }}
-					contentContainerStyle={{}}
-				>
-					{scheduleLogs.map((log) => (
-						<View key={log.id} className="flex-row border-b p-2 bg-white">
-							<Text className="flex-1">{log.createdAt}</Text>
-							<Text className="flex-1">{log.scheduleDate}</Text>
-							<Text className="flex-2">{log.status}</Text>
-						</View>
-					))}
-				</ScrollView>
-			</View>
-
-			<Text className="text-2xl font-bold mb-3 text-primary">
+			<Text className="text-2xl font-bold mb-4 text-primary">
 				User Login Logs
 			</Text>
-			<View className="border rounded-lg overflow-hidden mb-8">
+
+			<View className="border border-primary rounded-md overflow-hidden">
 				<View className="flex-row bg-gray-200 p-2">
-					<Text className="flex-1 font-semibold">Timestamp</Text>
-					<Text className="flex-1 font-semibold">User</Text>
-					<Text className="flex-2 font-semibold">Action</Text>
+					<Text className="flex-1 text-sm font-medium">Email</Text>
+					<Text className="flex-1 text-sm font-medium">Login</Text>
+					<Text className="flex-1 text-sm font-medium">Logout</Text>
+					<Text className="flex-1 text-sm font-medium">Status</Text>
 				</View>
 
-				<ScrollView style={{ maxHeight: tableHeight }}>
-					{loginLogs.map((log) => (
-						<View key={log.id} className="flex-row border-b p-2 bg-white">
-							<Text className="flex-1">{log.timestamp}</Text>
-							<Text className="flex-1">{log.user}</Text>
-							<Text
-								className={`flex-2 font-bold ${
-									log.active ? "text-green-600" : "text-red-500"
-								}`}
-							>
-								{log.active ? "Active" : "Logout"}
-							</Text>
-						</View>
-					))}
-				</ScrollView>
+				{logs.map((log) => (
+					<View key={log._id} className="flex-row border-b p-1 bg-white">
+						<Text className="flex-1 text-xs">{log.email}</Text>
+						<Text className="flex-1 text-xs">
+							{formatManilaTime(log.loginTime)}
+						</Text>
+
+						<Text className="flex-1 text-xs">
+							{formatManilaTime(log.logoutTime)}
+						</Text>
+
+						<Text
+							className={`flex-1 text-xs font-bold ${
+								log.status === "ACTIVE" ? "text-green-600" : "text-red-500"
+							}`}
+						>
+							{log.status}
+						</Text>
+					</View>
+				))}
 			</View>
 		</ScrollView>
 	);
