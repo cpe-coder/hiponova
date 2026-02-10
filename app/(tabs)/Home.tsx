@@ -21,7 +21,6 @@ export default function Home() {
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const isStartingRef = useRef(false);
 
-	/* -------------------- FIREBASE HELPERS -------------------- */
 	const startDehydrating = async () =>
 		await set(ref(database, "device/dehydrating"), true);
 	const stopDehydrating = async () =>
@@ -33,7 +32,6 @@ export default function Home() {
 	const setGrinding = async (value: boolean) =>
 		await set(ref(database, "device/grinding"), value);
 
-	/* -------------------- FIREBASE LISTENERS -------------------- */
 	useEffect(() => {
 		const unsubTemp = onValue(
 			ref(database, "sensor/temperature"),
@@ -85,33 +83,35 @@ export default function Home() {
 		};
 	}, []);
 
-	/* -------------------- TIMER LOGIC -------------------- */
 	const adjustTimer = (deltaSeconds: number) => {
 		setRemainingSeconds((prev) => {
 			const updated = prev + deltaSeconds;
 			return updated > 0 ? updated : 0;
 		});
 	};
-
 	const startTimer = async () => {
 		const minutes = Number(timerMinutes);
 		if (!minutes || minutes <= 0) return;
 
 		isStartingRef.current = true;
 
-		// Reset cancel first
 		await setCancel(false);
 		await setStarting(true);
 
 		const totalSeconds = minutes * 60;
 		setRemainingSeconds(totalSeconds);
+		setIsDehydrating(true);
 
 		await startDehydrating();
 
-		intervalRef.current = setInterval(() => {
+		intervalRef.current = setInterval(async () => {
 			setRemainingSeconds((prev) => {
 				if (prev <= 1) {
-					cancelTimer();
+					clearInterval(intervalRef.current!);
+					intervalRef.current = null;
+
+					setIsDehydrating(false);
+					stopDehydrating(); // update Firebase
 					return 0;
 				}
 				return prev - 1;
@@ -130,26 +130,23 @@ export default function Home() {
 		}
 
 		setRemainingSeconds(0);
+		setIsDehydrating(false);
+
 		await stopDehydrating();
-
-		// Update Firebase: cancel momentary trigger
 		await setStarting(false);
-		await setCancel(true);
+		await setCancel(true); // only user cancel triggers this
 
-		// Automatically reset cancel to false after 1 second
 		setTimeout(async () => {
 			await setCancel(false);
 		}, 10000);
 	};
 
-	/* -------------------- FORMAT -------------------- */
 	const formatTime = (seconds: number) => {
 		const m = Math.floor(seconds / 60);
 		const s = seconds % 60;
 		return `${m}:${s.toString().padStart(2, "0")}`;
 	};
 
-	/* -------------------- UI -------------------- */
 	return (
 		<SafeAreaView className="flex-1 bg-gray-50 px-4">
 			<View className="py-4">
@@ -204,9 +201,9 @@ export default function Home() {
 
 				<TouchableOpacity
 					onPress={startTimer}
-					disabled={isDehydrating}
+					disabled={isDehydrating || !starting} // ✅ disable if dehydrating OR starting is false
 					className={`py-3 rounded ${
-						isDehydrating ? "bg-gray-400" : "bg-blue-600"
+						isDehydrating || !starting ? "bg-gray-400" : "bg-blue-600"
 					}`}
 				>
 					<Text className="text-white text-center font-bold">Start Timer</Text>
