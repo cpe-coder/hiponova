@@ -12,7 +12,7 @@ interface AuthProps {
 }
 
 const TOKEN_KEY = "TOKEN";
-export const API_URL = "https://hiponova-server.vercel.app";
+export const API_URL = "https://hiponova-server-kappa.vercel.app";
 const AuthContext = createContext<AuthProps>({});
 
 export const useAuth = () => {

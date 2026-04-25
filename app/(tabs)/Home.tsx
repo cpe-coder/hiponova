@@ -20,6 +20,7 @@ export default function Home() {
 
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const isStartingRef = useRef(false);
+	const endTimeRef = useRef<number | null>(null);
 
 	const startDehydrating = async () =>
 		await set(ref(database, "device/dehydrating"), true);
@@ -81,14 +82,20 @@ export default function Home() {
 			unsubCancel();
 			if (intervalRef.current) clearInterval(intervalRef.current);
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const adjustTimer = (deltaSeconds: number) => {
+		if (!endTimeRef.current) return;
+
+		endTimeRef.current += deltaSeconds * 1000;
+
 		setRemainingSeconds((prev) => {
 			const updated = prev + deltaSeconds;
 			return updated > 0 ? updated : 0;
 		});
 	};
+
 	const startTimer = async () => {
 		const minutes = Number(timerMinutes);
 		if (!minutes || minutes <= 0) return;
@@ -99,23 +106,32 @@ export default function Home() {
 		await setStarting(true);
 
 		const totalSeconds = minutes * 60;
+
+		const now = Date.now();
+		endTimeRef.current = now + totalSeconds * 1000;
+
 		setRemainingSeconds(totalSeconds);
 		setIsDehydrating(true);
 
 		await startDehydrating();
 
 		intervalRef.current = setInterval(async () => {
-			setRemainingSeconds((prev) => {
-				if (prev <= 1) {
-					clearInterval(intervalRef.current!);
-					intervalRef.current = null;
+			if (!endTimeRef.current) return;
 
-					setIsDehydrating(false);
-					stopDehydrating(); // update Firebase
-					return 0;
-				}
-				return prev - 1;
-			});
+			const now = Date.now();
+			const diff = Math.floor((endTimeRef.current - now) / 1000);
+
+			if (diff <= 0) {
+				clearInterval(intervalRef.current!);
+				intervalRef.current = null;
+
+				setRemainingSeconds(0);
+				setIsDehydrating(false);
+				await stopDehydrating();
+				return;
+			}
+
+			setRemainingSeconds(diff);
 		}, 1000);
 
 		setTimeout(() => {
@@ -129,22 +145,27 @@ export default function Home() {
 			intervalRef.current = null;
 		}
 
+		endTimeRef.current = null;
+
 		setRemainingSeconds(0);
 		setIsDehydrating(false);
 
 		await stopDehydrating();
 		await setStarting(false);
-		await setCancel(true); // only user cancel triggers this
+		await setCancel(true);
 
 		setTimeout(async () => {
 			await setCancel(false);
 		}, 10000);
 	};
-
 	const formatTime = (seconds: number) => {
-		const m = Math.floor(seconds / 60);
-		const s = seconds % 60;
-		return `${m}:${s.toString().padStart(2, "0")}`;
+		const hrs = Math.floor(seconds / 3600);
+		const mins = Math.floor((seconds % 3600) / 60);
+		const secs = seconds % 60;
+
+		return `${hrs.toString().padStart(2, "0")}:${mins
+			.toString()
+			.padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 	};
 
 	return (
